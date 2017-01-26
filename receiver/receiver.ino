@@ -8,9 +8,13 @@
 
 #include <VirtualWire.h>    
 
+String infoA;
+String infoB;
 void setup()
 {
   Serial.begin(9600);
+
+  
   vw_set_ptt_inverted(true); // On a communication line means that each 
 // party is either transmitting or receiving ( like a walkie talkie)
   vw_set_rx_pin(12); // set receiver pin
@@ -22,14 +26,32 @@ void setup()
   uint8_t buf[VW_MAX_MESSAGE_LEN]; // 80 bytes is messgage length
   uint8_t buflen = VW_MAX_MESSAGE_LEN;
 
+  char sensorDataTemp[VW_MAX_MESSAGE_LEN+1];
+  String helper;
   if (vw_get_message(buf, &buflen)) { // if message received
-    if(buf[0]=='X'){  // and if the first letter in message array is X 
-      Serial.println("PLEASE"); 
+    memset(sensorDataTemp, 0, VW_MAX_MESSAGE_LEN+1);
+    
+    for(int i = 0; i < buflen; i++){
+      sensorDataTemp[i] = (char)buf[i];
+    }
+
+    
+    sensorDataTemp[VW_MAX_MESSAGE_LEN+1] = "\0";
+    helper = sensorDataTemp;
+    if(helper[0]=='A'){  // and if the first letter in message array is X 
+      infoA = helper.substring(1,4);
      }  
-  else if(buf[0]!='X'){
-      Serial.println("NO GO");
+  else if(helper[0]!='A'){
+      infoB = helper.substring(1,4);
     }
 
   } 
+  Serial.print("helper:\t");
+  Serial.print(helper[2]);
+  Serial.print("\tA:\t");
+  Serial.print(infoA);
+  Serial.print("B:\t");
+  Serial.println(infoB);
+  delay(20);
 }
  

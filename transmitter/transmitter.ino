@@ -7,12 +7,14 @@
 
 
 #include <VirtualWire.h>
-const char *message = "Merry Christmas";
-int button = 2;
+String message = "";
+int potentiometerPin = A0;
 
-
+int potentiometerState;
+unsigned int len;
+char buf[VW_MAX_MESSAGE_LEN];
 void setup() {
-  pinMode(button,INPUT);
+  pinMode(potentiometerPin,INPUT);
   
   Serial.begin(9600);
   vw_set_ptt_inverted(true); // On a communication line means that each 
@@ -22,16 +24,12 @@ void setup() {
 }
 
 void loop(){
-  
-  if (digitalRead(button) == HIGH){  
-    message="X";
-    Serial.println("X");
-    vw_send((uint8_t *)message, strlen(message)); // send the message
+  potentiometerState = analogRead(potentiometerPin);
+    potentiometerState = map(potentiometerState, 0, 1023, 0 ,255);
+    message="A" + (String)potentiometerState;
+    
+    message.toCharArray(buf, 5);
+    Serial.println(buf);
+    vw_send((uint8_t *)buf, 5); // send the message
     vw_wait_tx(); // Wait until the whole message is gone
-  } else{
-    message="A";
-    Serial.println("X");
-    vw_send((uint8_t *)message, strlen(message)); // send the message
-    vw_wait_tx(); // Wait until the whole message is gone
-  }
 }
